@@ -11,7 +11,7 @@ var RESPONSE_TYPE = {
 }
 
 
-// READ ALL - GET : /products
+// Read all - GET : /products
 // return all products
 router.get('/', function (req, res, next) {
 
@@ -22,7 +22,7 @@ router.get('/', function (req, res, next) {
 	}
 });
 
-// READ - GET - /products/productId
+// Read - GET - /products/productId
 // returns unique product
 router.get('/:id', function (req, res, next) {
 
@@ -42,6 +42,35 @@ router.post('/', function (req, res, next) {
 		genericResponseHandler.call(null, res, next, err, result);
 	}
 });
+
+// Update - PUT - /products/id
+router.put('/:id', function (req, res, next) {
+	Product.update(req.params.id, req.body, responseCallback);
+	
+	function responseCallback(err, result) {
+		genericResponseHandler.call(null, res, next, err, result);
+	}
+});
+
+// Destroy  - /products/id
+// Delete a specific product
+router.delete('/:id', function (req, res, next) {
+	Product.delete(req.params.id, responseCallback);
+	
+	function responseCallback(err, result) {
+		genericResponseHandler.call(null, res, next, err, result);
+	}
+});
+
+// Delete All (UN SAFE)  - /products/
+// router.delete('/', function (req, res, next) {
+// 	// Remove all documents from product collection
+// 	Product.deleteAll(responseCallback);
+	
+// 	function responseCallback(err, result) {
+// 		genericResponseHandler.call(null, res, next, err, result);
+// 	}
+// });
 
 function genericResponseHandler(res, next, err, result) {
 	var response = {};

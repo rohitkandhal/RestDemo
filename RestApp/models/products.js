@@ -4,9 +4,11 @@ var db = require('../db');
 var PRODUCT_COLL_NAME = 'products'; // Products table in db name
 var MAX_SAFE_INT = 9007199254740991;
 
-var INVALID_ID_ERROR = "A unique positive product ID is required.",
-    INVALID_NAME_ERROR = "A product name is required.",
-    INVALID_ID_RANGE_ERROR = "Product ID must be a valid positive integer";
+var ERROR = {
+    INVALID_ID: "A unique positive product ID is required.",
+    INVALID_NAME: "A product name is required.",
+    INVALID_ID_RANGE: "Product ID must be a valid positive integer"
+};
 
 // Database schema for Product model
 var productSchema = new mongoose.Schema({
@@ -18,8 +20,6 @@ var productSchema = new mongoose.Schema({
 
 // Create mongoose model
 mongoose.model('Product', productSchema);
-
-//db.get().collection(PRODUCT_COLL_NAME).createIndex({ id: 1 }, { unique: 1 });
 
 // Database search project specifies which fields to return
 var searchProjection = {
@@ -56,10 +56,9 @@ ProductModel.get = function get(searchId, callBack) {
         });
     } else {
         // Bad request
-        callBack(null, { error: { id: INVALID_ID_RANGE_ERROR } });
+        callBack(null, { error: { id: ERROR.INVALID_ID } });
     }
 }
-
 
 // Creates new product
 // param represents Input Product properties
@@ -87,44 +86,63 @@ ProductModel.create = function create(param, callBack) {
         // Build bad response with meaningful data
         callBack(null, { error: getInvalidProductError(param) });
     }
-
-    // Bad request
-    function getInvalidProductError(product) {
-        var response = {};
-
-        if (!product || !product.id || !Number(product.id) || product.id < 0) {
-            response.id = INVALID_ID_ERROR;
-        }
-
-        if (!product || !product.name) {
-            response.name = INVALID_NAME_ERROR;
-        }
-
-        return response;
-    }
 }
+
+ProductModel.update = function update(productId, updateData, callBack) {
+    var productCollection = db.get().collection(PRODUCT_COLL_NAME),
+        newProd = {};
+    
+    // Selective field updates
+    // If user sends only price to update then keep all other fields as it is.
+    if (updateData) {
+        if (updateData.id) {
+            newProd.id = Number(updateData.id);
+        }
+        if (updateData.name) {
+            newProd.name = updateData.name;
+        }
+        if (updateData.price) {
+            newProd.price = Number(updateData.price);
+        }
+    }
+    
+    productCollection.update({ id: Number(productId) }, { $set: newProd }, {}, function (err, r) {
+        var changeCount = r.result['n'],
+            outMessage = "No document updated";
+
+        if (changeCount) {
+            outMessage = changeCount + ' product updated.';
+        }
+        callBack(err, { message: outMessage});
+    });
+}
+
+ProductModel.delete = function (productId, callBack) {
+    var productCollection = db.get().collection(PRODUCT_COLL_NAME);
+    
+    productCollection.removeOne({ id: Number(productId) }, { w: 1 }, function (err, r) {
+        var changeCount = r.result["n"],    // 
+            outMessage = "No product deleted.";
+
+        if (changeCount) {
+            outMessage = changeCount + ' product deleted.';
+        }
+
+        callBack(err, { message: outMessage});
+    });
+}
+
+// Destroy All (UN SAFE) -  DELETE - /products/
+ProductModel.deleteAll = function deleteAll(callBack) {
+    var productCollection = db.get().collection(PRODUCT_COLL_NAME);
+    
+	// Remove all documents from product collection
+	productCollection.remove({}, function(err, r) {
+        callBack(err, { message: r.result["n"] + ' product deleted.'});
+	});
+};
 
 // HELPER FUNCTIONS
-
-// Return selected fields in output
-function formatProductOutput(rawProducts) {
-    var out = [];
-
-    rawProducts = Array.isArray(rawProducts) ? rawProducts : [rawProducts];
-
-    rawProducts.forEach(function (p) {
-
-        if (isValidProduct(p)) {
-
-            out.push({
-                id: p.id,
-                name: p.name,
-                price: p.price
-            });
-        }
-    });
-    return out;
-}
 
 // Valid Product rules:
 // a) Product ID must be a positive integer
@@ -141,6 +159,21 @@ function isValidProduct(product) {
         return true;
     }
     return false;
+}
+
+// Bad request
+function getInvalidProductError(product) {
+    var response = {};
+
+    if (!product || !product.id || !Number(product.id) || product.id < 0) {
+        response.id = ERROR.INVALID_ID;
+    }
+
+    if (!product || !product.name) {
+        response.name = ERROR.INVALID_NAME;
+    }
+
+    return response;
 }
 
 // export Product model
