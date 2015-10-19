@@ -2,15 +2,13 @@
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
-// var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var DB_URL = 'mongodb://localhost/restApp';
-
+// Database configuration
 var db = require('./db');
 var products = require('./controllers/products');
+var DB_URL = 'mongodb://localhost/restApp';
 
-// Connect to Mongo on service start
 db.connect(DB_URL, function (err) {
     if (err) {
         console.log('Unable to connect to database');
@@ -18,19 +16,6 @@ db.connect(DB_URL, function (err) {
         console.log('Connection successful...')
     }
 });
-
-// var mongoose = require('mongoose');
-// mongoose.connect(DB_URL, function(error) {
-//     if(error) {
-//       console.log('connection error', error);
-//     } else {
-//       console.log('connection successful');
-//     }
-// });
-
-// app routes configuration
-//var routes = require('./routes/index');
-//var products = require('./routes/products');
 
 var app = express();
 
@@ -40,9 +25,7 @@ app.set('view engine', 'ejs');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-//app.use(express.static(path.join(__dirname, 'public')));
 
-//app.use('/', routes);
 app.use('/products', products);
 
 // catch 404 and forward to error handler

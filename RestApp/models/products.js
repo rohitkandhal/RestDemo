@@ -105,21 +105,26 @@ ProductModel.update = function update(productId, updateData, callBack) {
             newProd.price = Number(updateData.price);
         }
     }
-    
-    productCollection.update({ id: Number(productId) }, { $set: newProd }, {}, function (err, r) {
-        var changeCount = r.result['n'],
-            outMessage = "No document updated";
 
-        if (changeCount) {
-            outMessage = changeCount + ' product updated.';
-        }
-        callBack(err, { message: outMessage});
-    });
+    if (Object.keys(newProd).length === 0) {
+        callBack(null, { error: { message: "Nothing to update." } });
+    } else {
+
+        productCollection.update({ id: Number(productId) }, { $set: newProd }, {}, function (err, r) {
+            var changeCount = r.result['n'],
+                outMessage = "No document updated";
+
+            if (changeCount) {
+                outMessage = changeCount + ' product updated.';
+            }
+            callBack(err, { message: outMessage });
+        });
+    }
 }
 
 ProductModel.delete = function (productId, callBack) {
     var productCollection = db.get().collection(PRODUCT_COLL_NAME);
-    
+
     productCollection.removeOne({ id: Number(productId) }, { w: 1 }, function (err, r) {
         var changeCount = r.result["n"],    // 
             outMessage = "No product deleted.";
@@ -128,7 +133,7 @@ ProductModel.delete = function (productId, callBack) {
             outMessage = changeCount + ' product deleted.';
         }
 
-        callBack(err, { message: outMessage});
+        callBack(err, { message: outMessage });
     });
 }
 
@@ -136,10 +141,10 @@ ProductModel.delete = function (productId, callBack) {
 ProductModel.deleteAll = function deleteAll(callBack) {
     var productCollection = db.get().collection(PRODUCT_COLL_NAME);
     
-	// Remove all documents from product collection
-	productCollection.remove({}, function(err, r) {
-        callBack(err, { message: r.result["n"] + ' product deleted.'});
-	});
+    // Remove all documents from product collection
+    productCollection.remove({}, function (err, r) {
+        callBack(err, { message: r.result["n"] + ' product deleted.' });
+    });
 };
 
 // HELPER FUNCTIONS
