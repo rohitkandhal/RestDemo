@@ -2,6 +2,10 @@
 
 A simple REST API to perform CRUD operation on a simple object
 
+###Usage
+ 1. Start mongodb in terminal '$mongod'
+ 2. Run app $npm start
+ 
 ###Object structure
 Product:
 	id (_integer_): Unique product identifier
@@ -31,11 +35,15 @@ Product:
     "data": []
 }
  3. Update
+ Single document update are supported
+ Selective field update supported
+ 
  4. Delete 
  
  ###Application architecture
  
- 1. Exceptions should be handled by generic app error handler
+ 1. Exceptions should be handled by generic app error handler.
+ 2. Get command should return data. PUT POST DELETE should return the request status.
  
  ###Mongo notes
  db.products.drop() - delete product collection (or table) from database
