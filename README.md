@@ -3,9 +3,10 @@
 A simple REST API to perform CRUD operations on a simple object (**Product**) using [JSend](https://labs.omniti.com/labs/jsend/wiki/WikiStart) JSON API specifications.
 
 ###Run instruction (on terminal)
- 1. Start mongo database: `$ mongod`
- 2. Run app: `$ npm start` - starts **node.js** app server.
- 3. Use [PostMan Rest Client](https://chrome.google.com/webstore/detail/postman-rest-client/fdmmgilgnpjigdojojpjoooidkmcomcm) to send REST calls to app server.
+ 1. Install required packages, _if needed_, `$ npm install`
+ 2. Start mongo database: `$ mongod`
+ 3. Run app: `$ npm start` - starts **node.js** app server.
+ 4. Use [PostMan Rest Client](https://chrome.google.com/webstore/detail/postman-rest-client/fdmmgilgnpjigdojojpjoooidkmcomcm) to send REST calls to app server.
  
 ###Object Schema
 ```
