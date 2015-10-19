@@ -1,7 +1,6 @@
 ###Rest API demo using node.js, mongodb
 
-A simple REST API to perform CRUD operations on a simple object (**Product**).  
-JSON API specifications: [JSend](https://labs.omniti.com/labs/jsend/wiki/WikiStart)
+A simple REST API to perform CRUD operations on a simple object (**Product**) using [JSend](https://labs.omniti.com/labs/jsend/wiki/WikiStart) JSON API specifications.
 
 ###Run instruction (on terminal)
  1. Start mongo database: `$ mongod`
